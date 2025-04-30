@@ -1,0 +1,53 @@
+replicaCount: 5
+
+image:
+  repository: ghcr.io/sbeuran/openprovider-devops-assesment
+  tag: ""
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+podAnnotations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+nodeSelector:
+  role: api
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: In
+          values:
+          - bank-api
+      topologyKey: "kubernetes.io/hostname"
+
+postgresql:
+  enabled: true
+  auth:
+    username: test
+    password: test
+    database: bdb
+  primary:
+    service:
+      port: 5432 

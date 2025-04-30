@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - BANK_POSTGRES_HOST=postgres:5432
+      - BANK_POSTGRES_DATABASE=bdb
+      - BANK_POSTGRES_USERNAME=test
+      - BANK_POSTGRES_PASSWORD=test
+      - BANK_POSTGRES_SSLMODE=disable
+      - BANK_POSTGRES_AUTOMIGRATE=true
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=bdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d bdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data: 
